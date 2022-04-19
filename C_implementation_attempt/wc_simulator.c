@@ -131,7 +131,7 @@ void run_simulation_set(int num_sim,int ts_size, double* initial_conditions, FIL
         if (sim_count>=num_sim) break;
     }
     if (sim_count<num_sim) num_sim = sim_count;
-    printf("Number of simulations: %d, length: %lf\n",num_sim,length);
+    //printf("Number of simulations: %d, length: %lf\n",num_sim,length);
     
     for(int i = 0; i<num_sim;i++){
         simulate_WC(ts_size, initial_conditions, params[i], output_tsE, output_tsI,dt,circ_array_size);
@@ -152,6 +152,8 @@ int main(int argc, char *argv[]){
     FILE* output_tsI;
     char line[1024];
     FILE* settings = fopen("./Simulations/Input_parameters/settings.csv", "r");
+    char path_to_filesE[55] = "./Simulations/Output_timeseries/simulation_testE0_0.csv";
+    char path_to_filesI[55] = "./Simulations/Output_timeseries/simulation_testI0_0.csv";
     if(fgets(line, 1024, settings)) {
         get_settings_from_csv_line(line, setting_vals);
    }
@@ -159,25 +161,44 @@ int main(int argc, char *argv[]){
     initial_conditions[0] = 0.25;
     initial_conditions[1] = 0.25;
 
-    length = setting_vals[0];
-    dt = setting_vals[1];
-    ts_size = (int)(1000*length/dt);
-    num_sim = (int) setting_vals[2];
-    output_tsE = fopen("./Simulations/Output_timeseries/simulation_testE.csv","wb");
-    if (output_tsE == NULL){
-        printf("Error while opening the file E.\n");
-        return 0;
+    
+    printf("np.array([\n");
+    for(int j = 0; j<10; j++){
+        printf("[");
+        length = setting_vals[0];
+        for(int i = 0; i<j; i++) length *= 2;
+        //printf("%lf",length);
+        dt = setting_vals[1];
+        ts_size = (int)(1000*length/dt);
+        num_sim = (int) setting_vals[2];
+        for(int i = 0; i<5; i++){
+                path_to_filesE[48] = j+'0';
+                path_to_filesE[50] = i+'0';
+                path_to_filesI[48] = j+'0';
+                path_to_filesI[50] = i+'0';
+                output_tsE = fopen(path_to_filesE,"wb");
+                if (output_tsE == NULL){
+                    printf("Error while opening the file E.\n");
+                    return 0;
+                }
+                output_tsI = fopen(path_to_filesI,"wb");
+                if (output_tsI == NULL){
+                    printf("Error while opening the file I.\n");
+                    return 0;
+                }
+                clock_t begin=clock();
+                run_simulation_set(num_sim,ts_size, initial_conditions, stream, output_tsE, output_tsI, dt, length);
+                clock_t end=clock();
+                printf("%lf,",(double)(end-begin)/CLOCKS_PER_SEC);
+                
+                fclose(output_tsE);
+                fclose(output_tsI);
+            }
+        printf("],\n");
     }
-    output_tsI = fopen("./Simulations/Output_timeseries/simulation_testI.csv","wb");
-    if (output_tsI == NULL){
-        printf("Error while opening the file I.\n");
-        return 0;
-    }
-    clock_t begin=clock();
-    run_simulation_set(num_sim,ts_size, initial_conditions, stream, output_tsE, output_tsI, dt, length);
-    clock_t end=clock();
-    printf("Time taken:%lf",(double)(end-begin)/CLOCKS_PER_SEC);
-    fclose(output_tsE);
-    fclose(output_tsI);
+    printf("])\n");
+    
+    //fclose(output_tsE);
+    //fclose(output_tsI);
     
 }
