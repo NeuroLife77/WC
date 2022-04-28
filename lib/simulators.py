@@ -2,7 +2,7 @@ import numpy as np
 from scipy import signal as sgl
 import numba
 from torch import as_tensor
-from parameters_info import sample_uniform_within_range
+from lib.parameters_info import sample_uniform_within_range
 
 ####################### No noise #######################
 
@@ -164,6 +164,7 @@ def WC_stochastic_heun_PSD(parameters,
         time_series_I[:,bad_sims] *= 0
     if remove_bad:
         time_series_E = time_series_E[:,np.logical_not(bad_sims)]
+        good_parameters = parameters[np.logical_not(bad_sims),:]
         time_series_I = time_series_I[:,np.logical_not(bad_sims)]
         try:
             if time_series_E.shape[1] < 1:
@@ -182,10 +183,10 @@ def WC_stochastic_heun_PSD(parameters,
         _ , psd_I = sgl.welch(time_series_I,fs=(1000/dt), nperseg=2000/dt, axis = 0)
         psd_I = psd_I.T[:,:PSD_cutoff]
         if out_tensor:
-            psd_E, psd_I, freq = as_tensor(psd_E), as_tensor(psd_I), as_tensor(freq)
-        return psd_E, psd_I, freq
+            psd_E, psd_I, freq, good_parameters = as_tensor(psd_E), as_tensor(psd_I), as_tensor(freq), as_tensor(good_parameters)
+        return psd_E, psd_I, freq, good_parameters
     else:
         time_series_I = None
         if out_tensor:
-            psd_E, freq = as_tensor(psd_E), as_tensor(freq)
-        return psd_E, freq
+            psd_E, freq, good_parameters = as_tensor(psd_E), as_tensor(freq), as_tensor(good_parameters)
+        return psd_E, freq, good_parameters
