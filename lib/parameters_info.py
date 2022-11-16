@@ -2,8 +2,8 @@ import numpy as np
 
 pars = {
     'c_ee': 16.0, #Ex-to-Ex coupling coefficient, index = 0
-    'c_ei': 12.0, #Ex-to-In coupling coefficient, index = 1
-    'c_ie': 15.0, #In-to-Ex coupling coefficient, index = 2
+    'c_ei': 12.0, #In-to-Ex coupling coefficient, index = 1
+    'c_ie': 15.0, #Ex-to-In coupling coefficient, index = 2
     'c_ii': 3.0, #In-to-In coupling coefficient, index = 3
     'tau_e': 8.0, #Ex membrane time-constant, index = 4
     'tau_i': 18.0, #In membrane time-constant, index = 5
@@ -67,8 +67,8 @@ parameters_lower_bound = np.array([
 parameters_upper_bound = np.array([
     1.6000e+01, #c_ee
     1.5000e+01, #c_ei
-    1.3000e+01, #c_ie
-    1.1000e+01, #c_ii
+    2.2000e+01, #c_ie
+    1.5000e+01, #c_ii
     1.5000e+02, #tau_e
     1.5000e+02, #tau_i
     1.4000e+00, #a_e
